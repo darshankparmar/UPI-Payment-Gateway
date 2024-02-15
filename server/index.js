@@ -80,8 +80,7 @@ String.prototype.shuffle = function () {
 }
 
 async function checkPayment(client_txn_id, txn_date, user) {
-	console.log(client_txn_id);
-	console.log(txn_date);
+	
 	await axios
 		.post("https://merchant.upigateway.com/api/check_order_status", {
 			client_txn_id,
@@ -90,7 +89,6 @@ async function checkPayment(client_txn_id, txn_date, user) {
 		})
 		.then((res) => {
 			const data = res.data;
-			// console.log(data);
 			if (data.status === true) {
 				const info = data.data;
 				if (info.status === "success") {
@@ -118,12 +116,11 @@ async function checkPayment(client_txn_id, txn_date, user) {
 			return res.data;
 		})
 		.catch((e) => {
-			// console.log(e);
+			console.log(e);
 		});
 }
 
 async function create(user) {
-	console.log(user);
 	try {
 		const participant = new Participant(user);
         await participant.save();
@@ -161,28 +158,15 @@ app.post("/pay",async function (req, res, next) {
 		3000,
 	);
 
-	console.log(payload);
-
-	let response = {
-		status: true,
-		msg: 'Order Created',
-		data: {
-		  order_id: 73861544,
-		  payment_url: 'https://merchant.upigateway.com/gateway/pay/5eee618cc2b3cc69f8a7633ac8241150',
-		  upi_id_hash: 'dc8522a14a62c324377cb4482fdb1d605da54bf452b9e535c59e388160994762'
-		}
-	  };
-
-	// let response = await axios
-	// 	.post("https://merchant.upigateway.com/api/create_order", payload)
-	// 	.then((res) => {
-	// 		console.log(res.data);
-	// 		return res.data;
-	// 	})
-	// 	.catch((e) => {
-	// 		console.log(e);
-	// 		return e;
-	// 	});
+	let response = await axios
+		.post("https://merchant.upigateway.com/api/create_order", payload)
+		.then((res) => {
+			return res.data;
+		})
+		.catch((e) => {
+			console.log(e);
+			return e;
+		});
 
 	res.json(response);
 });
